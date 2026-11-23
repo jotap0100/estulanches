@@ -36,3 +36,6 @@ npm ci
 npm run test:unit          # regras de negócio, sem banco
 npm run test:integration   # exige a stack no ar (docker compose up -d)
 ```
+
+## Vídeo de apresentação
+https://drive.google.com/file/d/1LKMtLvRQkN-tC62XPqfZPxq--51htY4I/view?usp=sharing
