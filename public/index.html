@@ -1,206 +1,162 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>EstuLanches — Cantina Escolar</title>
-<style>
-  :root { --verde:#2f7d4f; --verde-claro:#e8f4ec; --cinza:#f5f5f2; --borda:#dcdcd6; --texto:#22302a; }
-  * { box-sizing: border-box; }
-  body { margin:0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background:var(--cinza); color:var(--texto); }
-  header { background:var(--verde); color:#fff; padding:16px 20px; }
-  header h1 { margin:0; font-size:1.4rem; }
-  header p { margin:2px 0 0; opacity:.85; font-size:.9rem; }
-  main { max-width:1000px; margin:0 auto; padding:16px; display:grid; gap:16px; grid-template-columns: 1fr 1fr; }
-  @media (max-width:760px){ main { grid-template-columns:1fr; } }
-  section { background:#fff; border:1px solid var(--borda); border-radius:10px; padding:14px; }
-  section.largo { grid-column:1 / -1; }
-  h2 { margin:0 0 10px; font-size:1.05rem; }
-  ul { list-style:none; margin:0; padding:0; }
-  li { display:flex; justify-content:space-between; align-items:center; gap:8px; padding:8px 0; border-bottom:1px solid var(--borda); }
-  li:last-child { border-bottom:0; }
-  .preco { color:var(--verde); font-weight:600; white-space:nowrap; }
-  button { background:var(--verde); color:#fff; border:0; border-radius:6px; padding:6px 12px; cursor:pointer; font-size:.9rem; }
-  button.sec { background:#fff; color:var(--verde); border:1px solid var(--verde); }
-  button.perigo { background:#fff; color:#b3261e; border:1px solid #b3261e; }
-  button:disabled { opacity:.5; cursor:not-allowed; }
-  input { padding:7px 9px; border:1px solid var(--borda); border-radius:6px; font-size:.95rem; width:100%; }
-  .linha { display:flex; gap:8px; margin-top:8px; }
-  .total { font-weight:700; margin-top:10px; font-size:1.05rem; }
-  .vazio { color:#7a857f; font-size:.9rem; }
-  .badge { font-size:.75rem; padding:2px 8px; border-radius:99px; background:var(--verde-claro); color:var(--verde); font-weight:600; }
-  .badge.CANCELADO { background:#fde8e6; color:#b3261e; }
-  #msg { position:fixed; bottom:16px; left:50%; transform:translateX(-50%); background:#22302a; color:#fff; padding:10px 16px; border-radius:8px; display:none; max-width:90%; }
-  #msg.erro { background:#b3261e; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EstuLanches — Cantina Escolar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<header>
-  <h1>🥪 EstuLanches</h1>
-  <p>Cardápio e pedidos da cantina escolar</p>
-</header>
+  <div class="bg-glow" aria-hidden="true"></div>
 
-<main>
-  <section>
-    <h2>Cardápio</h2>
-    <ul id="cardapio"></ul>
-    <h2 style="margin-top:16px">Novo item</h2>
-    <div class="linha">
-      <input id="novoNome" placeholder="Nome (ex.: Bolo de cenoura)">
-      <input id="novoPreco" type="number" step="0.01" min="0" placeholder="Preço" style="max-width:110px">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="brand-logo" aria-hidden="true">🥪</div>
+        <div class="brand-text">
+          <h1>EstuLanches</h1>
+          <p>Cantina Escolar · Cardápio &amp; Pedidos</p>
+        </div>
+      </div>
+
+      <div class="topbar-actions">
+        <div class="kpi-group" aria-label="Resumo rápido">
+          <div class="kpi-pill">
+            <span class="kpi-dot kpi-dot-menu"></span>
+            <span><strong id="kpiCardapio">0</strong> itens</span>
+          </div>
+          <div class="kpi-pill">
+            <span class="kpi-dot kpi-dot-orders"></span>
+            <span><strong id="kpiAtivos">0</strong> em aberto</span>
+          </div>
+        </div>
+
+        <button id="btnTema" class="icon-btn" type="button" title="Alternar tema claro/escuro" aria-label="Alternar tema claro/escuro">
+          <svg id="iconeTemaLua" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+          <svg id="iconeTemaSol" class="icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+        </button>
+      </div>
     </div>
-    <div class="linha"><button id="btnNovo">Adicionar ao cardápio</button></div>
-  </section>
+  </header>
 
-  <section>
-    <h2>Seu pedido</h2>
-    <ul id="carrinho"></ul>
-    <div class="total" id="total">Total: R$ 0,00</div>
-    <input id="cliente" placeholder="Nome do aluno" style="margin-top:10px">
-    <div class="linha">
-      <button id="btnPedido">Finalizar pedido</button>
-      <button id="btnLimpar" class="sec">Limpar</button>
+  <main class="container">
+    <div class="workspace-grid">
+      <!-- Coluna Esquerda: Cardápio + Novo Item -->
+      <section class="card card-menu">
+        <div class="card-header">
+          <div>
+            <h2>Cardápio</h2>
+            <p class="card-subtitle">Escolha os lanches e adicione ao pedido</p>
+          </div>
+          <div class="search-box">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input id="buscaCardapio" type="search" placeholder="Buscar lanche..." aria-label="Buscar no cardápio">
+          </div>
+        </div>
+
+        <ul id="cardapio" class="menu-list"></ul>
+
+        <div class="divider"></div>
+
+        <div class="new-item-box">
+          <div class="new-item-header">
+            <h3>Cadastrar novo item</h3>
+            <span class="hint">Disponível imediatamente no cardápio</span>
+          </div>
+          <div class="new-item-form">
+            <div class="field field-grow">
+              <input id="novoNome" type="text" placeholder="Nome (ex.: Bolo de cenoura)" aria-label="Nome do novo item">
+            </div>
+            <div class="field field-price">
+              <span class="currency-prefix">R$</span>
+              <input id="novoPreco" type="number" step="0.01" min="0.01" placeholder="0,00" aria-label="Preço do novo item">
+            </div>
+            <button id="btnNovo" class="btn btn-secondary" type="button">
+              <span>+ Adicionar</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Coluna Direita: Seu Pedido (Carrinho) -->
+      <aside class="card card-cart">
+        <div class="card-header">
+          <div class="cart-title-wrap">
+            <h2>Seu pedido</h2>
+            <span id="badgeQtdCarrinho" class="count-badge">0</span>
+          </div>
+          <button id="btnLimpar" class="btn-ghost" type="button">Limpar</button>
+        </div>
+
+        <ul id="carrinho" class="cart-list"></ul>
+
+        <div class="cart-footer">
+          <div class="total-box">
+            <span class="total-label">Total do pedido</span>
+            <span class="total" id="total">R$ 0,00</span>
+          </div>
+
+          <div class="field-group">
+            <label for="cliente" class="sr-only">Nome do aluno</label>
+            <div class="input-with-icon">
+              <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+              </svg>
+              <input id="cliente" type="text" placeholder="Nome do aluno">
+            </div>
+          </div>
+
+          <button id="btnPedido" class="btn btn-primary btn-block" type="button">
+            Finalizar pedido
+          </button>
+        </div>
+      </aside>
     </div>
-  </section>
 
-  <section class="largo">
-    <h2>Pedidos</h2>
-    <ul id="pedidos"></ul>
-  </section>
-</main>
-<div id="msg"></div>
+    <!-- Seção Inferior: Pedidos -->
+    <section class="card largo card-orders">
+      <div class="card-header orders-header">
+        <div>
+          <h2>Pedidos recentes</h2>
+          <p class="card-subtitle">Acompanhe e atualize o status do preparo</p>
+        </div>
+        <div class="orders-controls">
+          <div id="filtrosPedidos" class="filter-pills" role="tablist" aria-label="Filtrar pedidos por status">
+            <button type="button" class="filter-pill active" data-status="TODOS">Todos</button>
+            <button type="button" class="filter-pill" data-status="PENDENTE">Pendente</button>
+            <button type="button" class="filter-pill" data-status="EM_PREPARO">Em preparo</button>
+            <button type="button" class="filter-pill" data-status="PRONTO">Pronto</button>
+            <button type="button" class="filter-pill" data-status="ENTREGUE">Entregue</button>
+            <button type="button" class="filter-pill" data-status="CANCELADO">Cancelado</button>
+          </div>
+          <button id="btnAtualizar" class="icon-btn" type="button" title="Atualizar pedidos" aria-label="Atualizar pedidos">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+            </svg>
+          </button>
+        </div>
+      </div>
 
-<script>
-const brl = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-const PROXIMO = { PENDENTE: 'EM_PREPARO', EM_PREPARO: 'PRONTO', PRONTO: 'ENTREGUE' };
-const NOME_STATUS = { PENDENTE: 'Pendente', EM_PREPARO: 'Em preparo', PRONTO: 'Pronto', ENTREGUE: 'Entregue', CANCELADO: 'Cancelado' };
+      <ul id="pedidos" class="orders-list"></ul>
+    </section>
+  </main>
 
-let cardapio = [];
-const carrinho = new Map(); // item_id -> quantidade
+  <div id="msg" role="status" aria-live="polite"></div>
 
-const $ = (id) => document.getElementById(id);
-
-function aviso(texto, erro = false) {
-  const el = $('msg');
-  el.textContent = texto;
-  el.className = erro ? 'erro' : '';
-  el.style.display = 'block';
-  clearTimeout(aviso.t);
-  aviso.t = setTimeout(() => (el.style.display = 'none'), 3500);
-}
-
-async function api(metodo, caminho, corpo) {
-  const res = await fetch(caminho, {
-    method: metodo,
-    headers: { 'Content-Type': 'application/json' },
-    body: corpo ? JSON.stringify(corpo) : undefined,
-  });
-  const dados = await res.json();
-  if (!res.ok) throw new Error((dados.erros || ['Erro inesperado']).join('; '));
-  return dados;
-}
-
-function el(tag, texto, classe) {
-  const e = document.createElement(tag);
-  if (texto !== undefined) e.textContent = texto;
-  if (classe) e.className = classe;
-  return e;
-}
-
-function desenharCardapio() {
-  const ul = $('cardapio');
-  ul.replaceChildren();
-  cardapio.forEach((item) => {
-    const li = el('li');
-    const nome = el('span', item.nome);
-    const dir = el('span');
-    dir.append(el('span', brl(item.preco), 'preco'), document.createTextNode(' '));
-    const b = el('button', '+ Adicionar');
-    b.disabled = !item.disponivel;
-    b.onclick = () => { carrinho.set(item.id, (carrinho.get(item.id) || 0) + 1); desenharCarrinho(); };
-    dir.append(b);
-    li.append(nome, dir);
-    ul.append(li);
-  });
-}
-
-function desenharCarrinho() {
-  const ul = $('carrinho');
-  ul.replaceChildren();
-  let total = 0;
-  if (carrinho.size === 0) ul.append(el('li', 'Nenhum item ainda.', 'vazio'));
-  carrinho.forEach((qtd, id) => {
-    const item = cardapio.find((i) => i.id === id);
-    if (!item) return;
-    total += Math.round(item.preco * 100) * qtd;
-    const li = el('li');
-    li.append(el('span', `${qtd}× ${item.nome}`));
-    const b = el('button', 'Remover', 'sec');
-    b.onclick = () => { qtd > 1 ? carrinho.set(id, qtd - 1) : carrinho.delete(id); desenharCarrinho(); };
-    li.append(b);
-    ul.append(li);
-  });
-  $('total').textContent = 'Total: ' + brl(total / 100);
-}
-
-async function carregarCardapio() {
-  cardapio = await api('GET', '/cardapio');
-  desenharCardapio();
-  desenharCarrinho();
-}
-
-async function carregarPedidos() {
-  const lista = await api('GET', '/pedidos');
-  const ul = $('pedidos');
-  ul.replaceChildren();
-  if (!lista.length) ul.append(el('li', 'Nenhum pedido ainda.', 'vazio'));
-  lista.forEach((p) => {
-    const li = el('li');
-    const esq = el('span');
-    esq.append(el('strong', `#${p.id} · ${p.cliente}`), document.createTextNode(' — '), el('span', brl(p.total), 'preco'));
-    const dir = el('span');
-    dir.append(el('span', NOME_STATUS[p.status] || p.status, 'badge ' + p.status), document.createTextNode(' '));
-    if (PROXIMO[p.status]) {
-      const b = el('button', '→ ' + NOME_STATUS[PROXIMO[p.status]]);
-      b.onclick = () => mudarStatus(p.id, PROXIMO[p.status]);
-      dir.append(b, document.createTextNode(' '));
-    }
-    if (p.status === 'PENDENTE' || p.status === 'EM_PREPARO') {
-      const c = el('button', 'Cancelar', 'perigo');
-      c.onclick = () => mudarStatus(p.id, 'CANCELADO');
-      dir.append(c);
-    }
-    li.append(esq, dir);
-    ul.append(li);
-  });
-}
-
-async function mudarStatus(id, status) {
-  try { await api('PATCH', `/pedidos/${id}/status`, { status }); await carregarPedidos(); }
-  catch (e) { aviso(e.message, true); }
-}
-
-$('btnPedido').onclick = async () => {
-  try {
-    const itens = [...carrinho].map(([item_id, quantidade]) => ({ item_id, quantidade }));
-    const p = await api('POST', '/pedidos', { cliente: $('cliente').value, itens });
-    aviso(`Pedido #${p.id} criado! Total ${brl(p.total)}`);
-    carrinho.clear(); $('cliente').value = '';
-    desenharCarrinho(); await carregarPedidos();
-  } catch (e) { aviso(e.message, true); }
-};
-
-$('btnLimpar').onclick = () => { carrinho.clear(); desenharCarrinho(); };
-
-$('btnNovo').onclick = async () => {
-  try {
-    await api('POST', '/cardapio', { nome: $('novoNome').value, preco: parseFloat($('novoPreco').value) });
-    $('novoNome').value = ''; $('novoPreco').value = '';
-    aviso('Item adicionado ao cardápio'); await carregarCardapio();
-  } catch (e) { aviso(e.message, true); }
-};
-
-carregarCardapio().then(carregarPedidos).catch((e) => aviso(e.message, true));
-</script>
+  <script src="app.js"></script>
 </body>
 </html>
