@@ -39,3 +39,7 @@ npm run test:integration   # exige a stack no ar (docker compose up -d)
 
 ## Vídeo de apresentação
 
+https://drive.google.com/file/d/1gvpdp9IuipA6DeSS2vNIHlyNg9x5xmAz/view?usp=drive_link
+
+
+
